@@ -562,21 +562,26 @@ case $OPTION in
 
 	# Nginx installation from source does not add an init script for systemd and logrotate
 	# Using the official systemd script and logrotate conf from nginx.org
-	if [[ ! -e /lib/systemd/system/nginx.service ]]; then
+	if [[ ! -e /lib/systemd/system/pegaflare.service ]]; then
 		cd /lib/systemd/system/ || exit 1
-		wget https://raw.githubusercontent.com/yahyakadiralbayrak/nginx-autoinstall/master/conf-v2/nginx.service
+		wget https://raw.githubusercontent.com/yahyakadiralbayrak/nginx-autoinstall/master/conf-v2/pegaflare.service
 		# Enable nginx start at boot
-		systemctl enable nginx
+		systemctl enable pegaflare
 	fi
 
-	if [[ ! -e /etc/logrotate.d/nginx ]]; then
+	if [[ ! -e /etc/logrotate.d/pegaflare ]]; then
 		cd /etc/logrotate.d/ || exit 1
-		wget https://raw.githubusercontent.com/yahyakadiralbayrak/nginx-autoinstall/master/conf-v2/nginx-logrotate -O nginx
+		wget https://raw.githubusercontent.com/yahyakadiralbayrak/nginx-autoinstall/master/conf-v2/pegaflare-logrotate -O pegaflare
 	fi
 
 	# Nginx's cache directory is not created by default
 	if [[ ! -d /var/cache/pegaflare ]]; then
 		mkdir -p /var/cache/pegaflare
+	fi
+
+	# Nginx's logs directory is not created by default
+	if [[ ! -d /var/log/pegaflare ]]; then
+		mkdir -p /var/log/pegaflare
 	fi
 
 	# We add the sites-* folders as some use them.
