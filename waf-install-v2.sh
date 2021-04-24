@@ -344,7 +344,7 @@ case $OPTION in
 	if [[ ! -e /etc/pegaflare/pegaflare.conf ]]; then
 		mkdir -p /etc/pegaflare
 		cd /etc/pegaflare || exit 1
-		wget https://raw.githubusercontent.com/yahyakadiralbayrak/nginx-autoinstall/master/conf/pegaflare.conf
+		wget https://raw.githubusercontent.com/yahyakadiralbayrak/nginx-autoinstall/master/conf-v2/pegaflare.conf
 	fi
 	cd /usr/local/src/nginx/nginx-${NGINX_VER} || exit 1
 
@@ -564,14 +564,14 @@ case $OPTION in
 	# Using the official systemd script and logrotate conf from nginx.org
 	if [[ ! -e /lib/systemd/system/nginx.service ]]; then
 		cd /lib/systemd/system/ || exit 1
-		wget https://raw.githubusercontent.com/yahyakadiralbayrak/nginx-autoinstall/master/conf/nginx.service
+		wget https://raw.githubusercontent.com/yahyakadiralbayrak/nginx-autoinstall/master/conf-v2/nginx.service
 		# Enable nginx start at boot
 		systemctl enable nginx
 	fi
 
 	if [[ ! -e /etc/logrotate.d/nginx ]]; then
 		cd /etc/logrotate.d/ || exit 1
-		wget https://raw.githubusercontent.com/yahyakadiralbayrak/nginx-autoinstall/master/conf/nginx-logrotate -O nginx
+		wget https://raw.githubusercontent.com/yahyakadiralbayrak/nginx-autoinstall/master/conf-v2/nginx-logrotate -O nginx
 	fi
 
 	# Nginx's cache directory is not created by default
