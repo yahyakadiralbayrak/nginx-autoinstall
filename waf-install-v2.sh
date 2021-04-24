@@ -621,7 +621,7 @@ case $OPTION in
 		done
 	fi
 	# Stop Nginx
-	systemctl stop nginx
+	systemctl stop pegaflare
 
 	# Removing Nginx files and modules files
 	rm -r /usr/local/src/nginx \
@@ -630,8 +630,8 @@ case $OPTION in
 		/usr/local/include/luajit* \
 		/etc/logrotate.d/nginx \
 		/var/cache/pegaflare \
-		/lib/systemd/system/nginx.service \
-		/etc/systemd/system/multi-user.target.wants/nginx.service
+		/lib/systemd/system/pegaflare.service \
+		/etc/systemd/system/multi-user.target.wants/pegaflare.service
 
 	# Reload systemctl
 	systemctl daemon-reload
