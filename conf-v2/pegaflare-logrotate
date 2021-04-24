@@ -1,0 +1,15 @@
+/var/log/pegaflare/*.log {
+        weekly
+        missingok
+        rotate 52
+        compress
+        delaycompress
+        notifempty
+        create 640 www-data adm
+        sharedscripts
+        postrotate
+                if [ -f /var/run/pegaflare.pid ]; then
+                        kill -USR1 `cat /var/run/pegaflare.pid`
+                fi
+        endscript
+}

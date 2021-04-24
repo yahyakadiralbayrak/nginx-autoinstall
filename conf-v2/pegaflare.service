@@ -1,0 +1,17 @@
+[Unit]
+Description=PegaFlare Proxy Server
+After=network.target nss-lookup.target
+
+[Service]
+Type=forking
+PIDFile=/run/pegaflare.pid
+ExecStartPre=/usr/sbin/nginx -t -q -g 'daemon on; master_process on;'
+ExecStart=/usr/sbin/nginx -g 'daemon on; master_process on;'
+ExecStartPost=/bin/sleep 0.1
+ExecReload=/usr/sbin/nginx -g 'daemon on; master_process on;' -s reload
+ExecStop=-/sbin/start-stop-daemon --quiet --stop --retry QUIT/5 --pidfile /run/pegaflare.pid
+TimeoutStopSec=5
+KillMode=mixed
+
+[Install]
+WantedBy=multi-user.target
