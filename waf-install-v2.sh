@@ -657,12 +657,12 @@ case $OPTION in
 	exit
 	;;
 3) # Update the script
-	wget https://raw.githubusercontent.com/yahyakadiralbayrak/nginx-autoinstall/master/nginx-autoinstall.sh -O nginx-autoinstall.sh
-	chmod +x nginx-autoinstall.sh
+	wget https://raw.githubusercontent.com/yahyakadiralbayrak/nginx-autoinstall/master/waf-install-v2.sh -O waf-install-v2.sh
+	chmod +x waf-install-v2.sh
 	echo ""
 	echo "Update done."
 	sleep 2
-	./nginx-autoinstall.sh
+	./waf-install-v2.sh
 	exit
 	;;
 4) # Install Bad Bot Blocker
