@@ -52,11 +52,11 @@ fi
 
 if [[ $HEADLESS != "y" ]]; then
 	echo ""
-	echo "Welcome to the nginx-autoinstall script."
+	echo "Welcome to the pegaflare script."
 	echo ""
 	echo "What do you want to do?"
-	echo "   1) Install or update Nginx"
-	echo "   2) Uninstall Nginx"
+	echo "   1) Install or update pegaflare"
+	echo "   2) Uninstall pegaflare"
 	echo "   3) Update the script"
 	echo "   4) Install Bad Bot Blocker"
 	echo "   5) Exit"
@@ -70,9 +70,9 @@ case $OPTION in
 1)
 	if [[ $HEADLESS != "y" ]]; then
 		echo ""
-		echo "This script will install Nginx with some optional modules."
+		echo "This script will install pegaflare with some optional modules."
 		echo ""
-		echo "Do you want to install Nginx stable or mainline?"
+		echo "Do you want to install pegaflare stable or mainline?"
 		echo "   1) Stable $NGINX_STABLE_VER"
 		echo "   2) Mainline $NGINX_MAINLINE_VER"
 		echo ""
@@ -95,7 +95,7 @@ case $OPTION in
 	if [[ $HEADLESS != "y" ]]; then
 		echo ""
 		echo "Please tell me which modules you want to install."
-		echo "If you select none, Nginx will be installed with its default modules."
+		echo "If you select none, pegaflare will be installed with its default modules."
 		echo ""
 		echo "Modules to install :"
 		while [[ $HTTP3 != "y" && $HTTP3 != "n" ]]; do
@@ -178,7 +178,7 @@ case $OPTION in
 	fi
 	if [[ $HEADLESS != "y" ]]; then
 		echo ""
-		read -n1 -r -p "Nginx is ready to be installed, press any key to continue..."
+		read -n1 -r -p "pegaflare is ready to be installed, press any key to continue..."
 		echo ""
 	fi
 
@@ -324,13 +324,13 @@ case $OPTION in
 		./configure
 		make -j "$(nproc)"
 		make install
-		mkdir /etc/nginx/modsec
-		wget -P /etc/nginx/modsec/ https://raw.githubusercontent.com/SpiderLabs/ModSecurity/v3/master/modsecurity.conf-recommended
-		mv /etc/nginx/modsec/modsecurity.conf-recommended /etc/nginx/modsec/modsecurity.conf
+		mkdir /etc/pegaflare/modsec
+		wget -P /etc/pegaflare/modsec/ https://raw.githubusercontent.com/SpiderLabs/ModSecurity/v3/master/modsecurity.conf-recommended
+		mv /etc/pegaflare/modsec/modsecurity.conf-recommended /etc/pegaflare/modsec/modsecurity.conf
 
 		# Enable ModSecurity in Nginx
 		if [[ $MODSEC_ENABLE == 'y' ]]; then
-			sed -i 's/SecRuleEngine DetectionOnly/SecRuleEngine On/' /etc/nginx/modsec/modsecurity.conf
+			sed -i 's/SecRuleEngine DetectionOnly/SecRuleEngine On/' /etc/pegaflare/modsec/modsecurity.conf
 		fi
 	fi
 
@@ -339,26 +339,26 @@ case $OPTION in
 	wget -qO- http://nginx.org/download/nginx-${NGINX_VER}.tar.gz | tar zxf -
 	cd nginx-${NGINX_VER} || exit 1
 
-	# As the default nginx.conf does not work, we download a clean and working conf from my GitHub.
+	# As the default pegaflare.conf does not work, we download a clean and working conf from my GitHub.
 	# We do it only if it does not already exist, so that it is not overriten if Nginx is being updated
-	if [[ ! -e /etc/nginx/nginx.conf ]]; then
-		mkdir -p /etc/nginx
-		cd /etc/nginx || exit 1
-		wget https://raw.githubusercontent.com/yahyakadiralbayrak/nginx-autoinstall/master/conf/nginx.conf
+	if [[ ! -e /etc/pegaflare/pegaflare.conf ]]; then
+		mkdir -p /etc/pegaflare
+		cd /etc/pegaflare || exit 1
+		wget https://raw.githubusercontent.com/yahyakadiralbayrak/nginx-autoinstall/master/conf-v3/pegaflare.conf
 	fi
 	cd /usr/local/src/nginx/nginx-${NGINX_VER} || exit 1
 
 	NGINX_OPTIONS="
-		--prefix=/etc/nginx \
-		--sbin-path=/usr/sbin/nginx \
-		--conf-path=/etc/nginx/nginx.conf \
-		--error-log-path=/var/log/nginx/error.log \
-		--http-log-path=/var/log/nginx/access.log \
-		--pid-path=/var/run/nginx.pid \
-		--lock-path=/var/run/nginx.lock \
-		--http-client-body-temp-path=/var/cache/nginx/client_temp \
-		--http-proxy-temp-path=/var/cache/nginx/proxy_temp \
-		--http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
+		--prefix=/etc/pegaflare \
+		--sbin-path=/usr/sbin/pegaflare \
+		--conf-path=/etc/pegaflare/pegaflare.conf \
+		--error-log-path=/var/log/pegaflare/error.log \
+		--http-log-path=/var/log/pegaflare/access.log \
+		--pid-path=/var/run/pegaflare.pid \
+		--lock-path=/var/run/pegaflare.lock \
+		--http-client-body-temp-path=/var/cache/pegaflare/client_temp \
+		--http-proxy-temp-path=/var/cache/pegaflare/proxy_temp \
+		--http-fastcgi-temp-path=/var/cache/pegaflare/fastcgi_temp \
 		--user=nginx \
 		--group=nginx \
 		--with-cc-opt=-Wno-deprecated-declarations \
@@ -558,40 +558,45 @@ case $OPTION in
 	make install
 
 	# remove debugging symbols
-	strip -s /usr/sbin/nginx
+	strip -s /usr/sbin/pegaflare
 
 	# Nginx installation from source does not add an init script for systemd and logrotate
 	# Using the official systemd script and logrotate conf from nginx.org
-	if [[ ! -e /lib/systemd/system/nginx.service ]]; then
+	if [[ ! -e /lib/systemd/system/pegaflare.service ]]; then
 		cd /lib/systemd/system/ || exit 1
-		wget https://raw.githubusercontent.com/yahyakadiralbayrak/nginx-autoinstall/master/conf/nginx.service
+		wget https://raw.githubusercontent.com/yahyakadiralbayrak/nginx-autoinstall/master/conf-v3/pegaflare.service
 		# Enable nginx start at boot
-		systemctl enable nginx
+		systemctl enable pegaflare
 	fi
 
-	if [[ ! -e /etc/logrotate.d/nginx ]]; then
+	if [[ ! -e /etc/logrotate.d/pegaflare ]]; then
 		cd /etc/logrotate.d/ || exit 1
-		wget https://raw.githubusercontent.com/yahyakadiralbayrak/nginx-autoinstall/master/conf/nginx-logrotate -O nginx
+		wget https://raw.githubusercontent.com/yahyakadiralbayrak/nginx-autoinstall/master/conf-v3/pegaflare-logrotate -O pegaflare
 	fi
 
 	# Nginx's cache directory is not created by default
-	if [[ ! -d /var/cache/nginx ]]; then
-		mkdir -p /var/cache/nginx
+	if [[ ! -d /var/cache/pegaflare ]]; then
+		mkdir -p /var/cache/pegaflare
+	fi
+
+	# Nginx's logs directory is not created by default
+	if [[ ! -d /var/log/pegaflare ]]; then
+		mkdir -p /var/log/pegaflare
 	fi
 
 	# We add the sites-* folders as some use them.
-	if [[ ! -d /etc/nginx/sites-available ]]; then
-		mkdir -p /etc/nginx/sites-available
+	if [[ ! -d /etc/pegaflare/sites-available-l7 ]]; then
+		mkdir -p /etc/pegaflare/sites-available-l7
 	fi
-	if [[ ! -d /etc/nginx/sites-enabled ]]; then
-		mkdir -p /etc/nginx/sites-enabled
+	if [[ ! -d /etc/pegaflare/sites-available-abuse ]]; then
+		mkdir -p /etc/pegaflare/sites-available-abuse
 	fi
-	if [[ ! -d /etc/nginx/conf.d ]]; then
-		mkdir -p /etc/nginx/conf.d
+	if [[ ! -d /etc/pegaflare/conf.d ]]; then
+		mkdir -p /etc/pegaflare/conf.d
 	fi
 
 	# Restart Nginx
-	systemctl restart nginx
+	systemctl restart pegaflare
 
 	# Block Nginx from being installed via APT
 	if [[ $(lsb_release -si) == "Debian" ]] || [[ $(lsb_release -si) == "Ubuntu" ]]; then
@@ -600,7 +605,7 @@ case $OPTION in
 	fi
 
 	# Removing temporary Nginx and modules files
-	rm -r /usr/local/src/nginx
+	#rm -r /usr/local/src/nginx
 
 	# We're done !
 	echo "Installation done."
@@ -616,29 +621,29 @@ case $OPTION in
 		done
 	fi
 	# Stop Nginx
-	systemctl stop nginx
+	systemctl stop pegaflare
 
 	# Removing Nginx files and modules files
 	rm -r /usr/local/src/nginx \
-		/usr/sbin/nginx* \
+		/usr/sbin/pegaflare* \
 		/usr/local/bin/luajit* \
 		/usr/local/include/luajit* \
-		/etc/logrotate.d/nginx \
-		/var/cache/nginx \
-		/lib/systemd/system/nginx.service \
-		/etc/systemd/system/multi-user.target.wants/nginx.service
+		/etc/logrotate.d/pegaflare \
+		/var/cache/pegaflare \
+		/lib/systemd/system/pegaflare.service \
+		/etc/systemd/system/multi-user.target.wants/pegaflare.service
 
 	# Reload systemctl
 	systemctl daemon-reload
 
 	# Remove conf files
 	if [[ $RM_CONF == 'y' ]]; then
-		rm -r /etc/nginx/
+		rm -r /etc/pegaflare/
 	fi
 
 	# Remove logs
 	if [[ $RM_LOGS == 'y' ]]; then
-		rm -r /var/log/nginx
+		rm -r /var/log/pegaflare
 	fi
 
 	# Remove Nginx APT block
@@ -652,12 +657,12 @@ case $OPTION in
 	exit
 	;;
 3) # Update the script
-	wget https://raw.githubusercontent.com/yahyakadiralbayrak/nginx-autoinstall/master/nginx-autoinstall.sh -O nginx-autoinstall.sh
-	chmod +x nginx-autoinstall.sh
+	wget https://raw.githubusercontent.com/yahyakadiralbayrak/nginx-autoinstall/master/waf-install-v2.sh -O waf-install-v2.sh
+	chmod +x waf-install-v2.sh
 	echo ""
 	echo "Update done."
 	sleep 2
-	./nginx-autoinstall.sh
+	./waf-install-v2.sh
 	exit
 	;;
 4) # Install Bad Bot Blocker
@@ -713,7 +718,7 @@ case $OPTION in
 
 	echo ""
 	echo "Fifth step is to run the setup script with the -x parameter,"
-	echo "to make all the necessary changes to your nginx.conf (if required),"
+	echo "to make all the necessary changes to your pegaflare.conf (if required),"
 	echo "and also to add the required includes into all your vhost files."
 	echo ""
 	read -n1 -r -p " press any key to continue..."
@@ -728,7 +733,7 @@ case $OPTION in
 	read -n1 -r -p " press any key to continue..."
 	echo ""
 
-	/usr/sbin/nginx -t
+	/usr/sbin/pegaflare -t
 
 	echo ""
 	echo "Seventh step is to restart Nginx,"
@@ -737,7 +742,7 @@ case $OPTION in
 	read -n1 -r -p " press any key to continue..."
 	echo ""
 
-	/usr/sbin/nginx -t && systemctl restart nginx
+	/usr/sbin/pegaflare -t && systemctl restart pegaflare
 
 	echo "That's it, the blocker is now active and protecting your sites from thousands of malicious bots and domains."
 	echo ""
